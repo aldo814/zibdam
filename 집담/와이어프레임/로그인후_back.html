@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>집담 — 로그인 후</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root{
+      --blue:#1B5CF4;--blue-dark:#1346C4;--cyan:#22D3EE;
+      --ink:#11161F;--muted:#5C6675;--line:#E7EAF0;
+      --bg:#FFFFFF;--bg-soft:#F4F7FE;--bg-gray:#F6F7F9;
+      --radius:14px;--maxw:1400px;
+      --shadow:0 1px 2px rgba(17,22,31,.04),0 8px 24px rgba(17,22,31,.06);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:"Pretendard",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+      color:var(--ink);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+    .section{margin:56px 0;;}
+    .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:12px}
+    .section-head h2{font-size:22px;font-weight:800;letter-spacing:-.02em}
+    .section-head .sub{font-size:13px;color:var(--muted);margin-top:6px}
+    .more{font-size:13px;color:var(--muted);white-space:nowrap}
+    .more:hover{color:var(--blue)}
+    .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#EAF0FE;color:var(--blue)}
+    .badge-new{background:#FFEDED;color:#E5484D}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14px;
+      padding:11px 18px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:.15s}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-primary:hover{background:var(--blue-dark)}
+  
+    /* 0. HEADER + 사용자 정보/포인트 */
+    header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;gap:28px;height:80px;}
+    .logo{font-size:20px;font-weight:900;letter-spacing:-.03em;color:var(--blue)}
+    .nav-links{display:flex;gap:50px;font-size:18px;font-weight:600;color:#000;margin: auto;}
+    .nav-links a:hover,.nav-links a.active{color:var(--ink)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .icon-btn{position:relative;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff;display:grid;place-items:center;font-size:15px;cursor:pointer}
+    .icon-btn .dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:#E5484D}
+    .link-login{font-size:14px;font-weight:600;color:var(--muted);padding:8px}
+    /* 포인트 칩 + 사용자 메뉴 */
+    .pt-chip{display:inline-flex;align-items:center;gap:5px;background:#EAF0FE;color:var(--blue);font-weight:800;font-size:13px;padding:8px 13px;border-radius:999px}
+    .user{position:relative}
+    .user-trigger{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px;border-radius:999px}
+    .avatar{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+    .uname{font-size:14px;font-weight:700}
+    .dropdown{position:absolute;right:0;top:48px;width:248px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px;display:none}
+    .user:hover .dropdown,.user:focus-within .dropdown{display:block}
+    .dd-points{background:linear-gradient(100deg,var(--blue),#3D74FF);color:#fff;border-radius:10px;padding:14px;margin-bottom:6px}
+    .dd-points .lab{font-size:12px;opacity:.85}
+    .dd-points .val{font-size:22px;font-weight:900;margin-top:2px}
+    .dd-points .delta{font-size:12px;opacity:.9;margin-top:6px}
+    .dd-item{display:flex;align-items:center;gap:9px;padding:10px 10px;border-radius:8px;font-size:14px;color:var(--ink)}
+    .dd-item:hover{background:var(--bg-soft)}
+    .dd-sep{height:1px;background:var(--line);margin:6px 4px}
+  
+    /* 1. HERO + 신뢰 지표 */
+    .hero{background:#EFF5FF;padding:66px 0 48px}
+    .hero .eyebrow{display:inline-block;font-size:12px;font-weight:700;color:var(--blue);background:#fff;
+      border:1px solid #D6E1FE;padding:6px 12px;border-radius:999px;margin-bottom:18px}
+    .hero h1{font-size:36px;font-weight:900;letter-spacing:-.03em;line-height:1.25}
+    .hero h1 .accent{color:var(--blue)}
+    .hero p{color:var(--muted);font-size:15px;margin:14px 0 28px}
+    .searchbar{max-width:620px;display:flex;background:#fff;border:1px solid var(--line);
+      border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+    .searchbar input{flex:1;min-width:0;border:0;padding:16px 18px;font-size:15px;outline:none;font-family:inherit}
+    .searchbar button{border:0;background:var(--blue);color:#fff;font-weight:700;padding:0 24px;cursor:pointer}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+    .tag{font-size:13px;color:var(--muted);background:#fff;border:1px solid var(--line);padding:7px 13px;border-radius:999px}
+    .tag:hover{border-color:var(--blue);color:var(--blue)}
+    .stats{display:flex;justify-content:center;gap:40px;margin-top:34px}
+    .stat .n{font-size:24px;font-weight:900;color:var(--ink)}
+    .stat .l{font-size:12.5px;color:var(--muted);margin-top:2px}
+  
+    /* 2. 주요 기능 바로가기 */
+    .quick{display:flex;justify-content: space-between;margin-top:1.875rem;position:relative;z-index:2;gap: 20px;}
+    .qcard{display:flex;gap:14px;align-items:flex-start;flex: 1 1;padding: 22px;border: 1px solid var(--line);;background: #fff;border-radius:var(--radius)}
+    .qcard:hover{border-color:var(--blue)}
+    .qico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:#EAF0FE;flex:none}
+    .qcard h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:6px}
+    .qcard p{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.55;margin-bottom: 0;}
+    .qcard .cnt{font-size:12px;color:var(--blue);font-weight:700;margin-top:8px}
+  
+    /* 3. 가치 + 인증 */
+    .why .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .feature{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px}
+    .feature .fico{width:46px;height:46px;border-radius:12px;margin-bottom:14px;display:grid;place-items:center;background:#EAF0FE;font-size:21px}
+    .feature h3{font-size:16px;font-weight:800}
+    .feature p{font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+    .auth-cta{margin-top:18px;background:linear-gradient(90deg,var(--blue),#3D74FF);color:#fff;border-radius:var(--radius);
+      padding:22px 26px;display:flex;align-items:center;gap:16px}
+    .auth-cta .ico{font-size:26px}
+    .auth-cta b{font-size:16px}
+    .auth-cta .desc{font-size:13px;opacity:.9;margin-top:2px}
+    .auth-cta .btn{margin-left:auto;background:#fff;color:var(--blue)}
+  
+    /* 광고 슬롯 (AdSense 대비) */
+    .ad-slot{border:1px dashed #C3CAD6;border-radius:12px;background:repeating-linear-gradient(45deg,#FAFBFC,#FAFBFC 10px,#F4F6F9 10px,#F4F6F9 20px);
+      color:#9AA3B2;font-size:12px;text-align:center;display:grid;place-items:center;gap:2px}
+    .ad-banner{min-height:104px;margin: 1.875rem 0;}
+    .ad-side{min-height:260px;padding:16px}
+    .ad-slot .label{font-weight:700;color:#8A93A2}
+  
+    /* 4. 거주리뷰 인기글 */
+    .review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .review-card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff}
+    .review-card .thumb{aspect-ratio:16/9;background:#E9ECF2;display:grid;place-items:center;color:#9AA3B2;font-size:13px}
+    .review-card .body{padding:16px}
+    .review-card .loc{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .review-card h3{font-size:15px;font-weight:700;margin:8px 0;letter-spacing:-.01em}
+    .review-card p{font-size:13px;color:var(--muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .chip{font-size:11px;background:#F1F3F7;color:#4A5263;padding:4px 9px;border-radius:6px}
+    .stars{color:#FFB020;font-size:13px;margin-top:12px}
+  
+    /* 5. 핵심 포인트 */
+    .points{background:var(--bg-gray);padding: 3.5rem 0;}
+    .point-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+    .point{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 10px;text-align:center}
+    .point .pico{font-size:24px}
+    .point .pl{font-size:13px;font-weight:700;margin-top:8px}
+    .point .pn{font-size:15px;font-weight:800;color:var(--blue);margin-top:4px}
+  
+    /* 6. 커뮤니티 허브 */
+    .hub{display:grid;grid-template-columns:1.7fr 1fr;gap:24px}
+    .panel{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:22px}
+    .panel .panel-top{display: flex;align-items: center;justify-content: space-between;}
+    .panel h3.ph{font-size:16px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .panel + .panel,.hub .ad-slot{margin-top:16px}
+    .post{display:flex;flex-direction:column;gap:6px;padding:13px 0;border-bottom:1px solid var(--line)}
+    .post:last-child{border-bottom:0}
+    .post .meta{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .post .title{font-size:14.5px;font-weight:600}
+    .post .stat2{font-size:11.5px;color:#9AA3B2;display:flex;gap:14px}
+    .rank-list{counter-reset:r}
+    .rank{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+    .rank:last-child{border-bottom:0}
+    .rank .num{counter-increment:r;width:20px;font-weight:800;color:var(--blue)}
+    .rank .num::before{content:counter(r)}
+    .rank.low .num{color:#9AA3B2}
+    .rank .arr{margin-left:auto;font-size:11px}
+    .arr.up{color:#E5484D}.arr.down{color:#3B82F6}.arr.same{color:#C0C6D0}
+    .upd{font-size:11.5px;color:var(--muted);margin-bottom:6px}
+    .nrow{display:flex;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+    .nrow:last-child{border-bottom:0}
+    .nrow .tg{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;background:#F1F3F7;color:#5C6675;white-space:nowrap}
+    .nrow .tg.new{background:#FFEDED;color:#E5484D}
+    .nrow .cnt{margin-left:auto;font-size:11.5px;color:#9AA3B2;white-space:nowrap}
+  
+    /* 7. 진행 중 이벤트 */
+    .events{}
+    .event{background:#11161F;color:#fff;border-radius:18px;
+      padding:30px 32px;display:flex;align-items:center;gap:20px;overflow:hidden;position:relative;flex-direction: column;justify-content: center;}
+    .event .gift{font-size:34px}
+    .event .etxt b{font-size:19px;font-weight:800}
+    .event .etxt .ed{font-size:13.5px;opacity:.85;margin-top:6px}
+    .event .btn{background:#fff;color:#06323A;position:relative;z-index:1}
+    .event-sub{background:var(--bg-soft);border:1px solid #D9E3FE;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:6px}
+    .event-sub .tag2{font-size:11px;font-weight:800;color:var(--blue)}
+    .event-sub b{font-size:16px}
+    .event-sub p{font-size:13px;color:var(--muted)}
+    .event-sub a{margin-top:auto;font-size:13px;font-weight:700;color:var(--blue)}
+    .events .dot{display: flex;justify-content: center;margin-top: 1.25rem;gap: 15px;list-style: none;}
+    .events .dot li a{width: 10px;height: 10px;background: #ddd;border-radius: 50%;display: flex;text-indent: -9999px;}
+    .events .dot li.active a{background: #000;}
+  
+    /* 8. 추천/부가 */
+    .media-wrap{display: flex;gap: 1.875rem;}
+    .media-wrap .item{flex: 1 1;}
+    .media-grid{display:flex;gap: 15px;}
+    .media{flex: 1 1;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff}
+    .media .mthumb{aspect-ratio:1/1;background:#E9ECF2;display:grid;place-items:center;color:#9AA3B2;font-size:24px}
+    .media .mt{font-size:13px;font-weight:600;padding:12px 14px}
+  
+    /* 9. FOOTER */
+    footer{background:#11161F;color:#9AA3B2;padding:42px 0}
+    footer .flogo{color:#fff;font-weight:900;font-size:18px}
+    footer .flinks{display:flex;gap:20px;font-size:13px;margin:16px 0 12px;flex-wrap:wrap}
+    footer .flinks a:hover{color:#fff}
+    footer .copy{font-size:12px;color:#5C6675}
+  
+    /* 리뷰 작성 플로팅 + 상태 미리보기 토글 */
+    .fab{position:fixed;right:24px;bottom:24px;z-index:60;background:var(--blue);color:#fff;font-weight:800;font-size:14px;
+      padding:14px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(27,92,244,.4);display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:0}
+    .fab:hover{background:var(--blue-dark)}
+    .preview{position:fixed;left:24px;bottom:24px;z-index:60;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);
+      border-radius:999px;font-size:12.5px;font-weight:700;padding:9px 14px;cursor:pointer;color:var(--muted)}
+  
+    @media(max-width:900px){
+      .nav-links{display:none}
+      .uname{display:none}
+      .quick{grid-template-columns:1fr;margin-top:18px}
+      .why .grid{grid-template-columns:1fr}
+      .review-grid{grid-template-columns:1fr}
+      .hub,.events{grid-template-columns:1fr}
+      .point-grid{grid-template-columns:repeat(3,1fr)}
+      .media-grid{grid-template-columns:repeat(2,1fr)}
+      .hero h1{font-size:27px}
+      .stats{gap:24px}
+      .event,.auth-cta{flex-direction:column;text-align:center}
+      .event .btn,.auth-cta .btn{margin:8px 0 0}
+    }
+</style>
+</head>
+<body data-auth="user">
+  
+  <!-- 0. HEADER -->
+  <header>
+    <div class="wrap nav">
+      <div class="logo">집담</div>
+      <nav class="nav-links">
+        <a href="#">담벼락</a>
+        <a href="#">우리단지</a>
+        <a href="#">거주리뷰</a>
+        <a href="#">이벤트</a>
+      </nav>
+  
+      <!-- 로그인 전 -->
+      <div class="nav-right" id="guestNav" style="display:none">
+        <button class="icon-btn" aria-label="검색">🔍</button>
+        <a href="#" class="link-login">로그인</a>
+        <a href="#" class="btn btn-primary">회원가입</a>
+      </div>
+  
+      <!-- 로그인 후 : 정보 + 포인트 현황 (헤더 배치) -->
+      <div class="nav-right" id="userNav" style="display:flex">
+        <button class="icon-btn" aria-label="검색">🔍</button>
+        <button class="icon-btn" aria-label="알림">🔔<span class="dot"></span></button>
+        <span class="pt-chip">💎 3,250P</span>
+        <div class="user" tabindex="0">
+          <div class="user-trigger">
+            <span class="uname">김은영</span>
+            <span style="color:var(--muted);font-size:11px">▾</span>
+          </div>
+          <div class="dropdown">
+            <div class="dd-points">
+              <div class="lab">보유 포인트</div>
+              <div class="val">3,250 P</div>
+              <div class="delta">이번 달 적립 +1,200P · 리뷰 1건 더 쓰면 +3,000P</div>
+            </div>
+            <a class="dd-item" href="#">👤 마이페이지</a>
+            <a class="dd-item" href="#">🏠 내 단지 (성동구 트리마제)</a>
+            <a class="dd-item" href="#">📝 내가 쓴 거주리뷰</a>
+            <a class="dd-item" href="#">💎 포인트 적립·사용 내역</a>
+            <div class="dd-sep"></div>
+            <a class="dd-item" href="#">⚙ 설정 · 로그아웃</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- 1. 히어로 + 신뢰 지표 -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">실거주자 인증 기반 주거 정보 플랫폼</span>
+      <h1>진짜 이웃이 전하는<br><span class="accent">우리 동네 이야기</span></h1>
+      <p>임장으로는 알 수 없는 정보, 집담에서는 실거주자만 리뷰를 작성할 수 있어요.</p>
+      <div class="searchbar">
+        <input type="text" placeholder="아파트명, 주소, 단지명을 입력하세요">
+        <button>집 검색하기</button>
+      </div>
+      <div class="tags">
+        <a class="tag" href="#"># 층간소음</a><a class="tag" href="#"># 주차</a>
+        <a class="tag" href="#"># 관리비</a><a class="tag" href="#"># 벌레·위생</a>
+        <a class="tag" href="#"># 교통·입지</a><a class="tag" href="#"># 치안</a><a class="tag" href="#"># 채광</a>
+      </div>
+      <!-- </div>
+      <div class="stats">
+        <div class="stat"><div class="n">12만+</div><div class="l">실거주 인증 회원</div></div>
+        <div class="stat"><div class="n">8.4만+</div><div class="l">등록 단지</div></div>
+        <div class="stat"><div class="n">34만+</div><div class="l">누적 거주리뷰</div></div>
+      </div> -->
+        
+  <!-- 2. 주요 기능 바로가기 (담벼락 / 우리단지 / 거주리뷰) -->
+  
+    <div class="quick">
+      <a class="qcard" href="#">
+        <div class="qico">💬</div>
+        <div><h3>담벼락</h3><p>이웃과 나누는 실시간 동네 이야기와 정보</p></div>
+      </a>
+      <a class="qcard" href="#">
+        <div class="qico">🏠</div>
+        <div><h3>우리단지 <span class="pill">인증</span></h3><p>인증 입주민만 보는 우리 단지 공지·소식</p></div>
+      </a>
+      <a class="qcard" href="#">
+        <div class="qico">⭐</div>
+        <div><h3>거주리뷰</h3><p>실거주자가 직접 남긴 솔직한 단지 후기</p></div>
+      </a>
+    </div>
+
+      
+    </div>
+  </section>
+  
+  
+  <!-- 3. 가치 + 인증 -->
+  <section class="section why">
+    <div class="wrap">
+      <div class="section-head"><div><h2>집담이 다른 이유</h2><div class="sub">실거주자만 쓸 수 있어 믿을 수 있는 정보예요.</div></div></div>
+      <div class="grid">
+        <div class="feature"><div class="fico">🛡</div><h3>입주민 인증</h3><p>실거주자만 글을 쓸 수 있어 광고·낚시 없는 정보만 모여요.</p></div>
+        <div class="feature"><div class="fico">👥</div><h3>단지별 커뮤니티</h3><p>우리 단지 이웃과만 소통하는 비공개 담벼락이 있어요.</p></div>
+        <div class="feature"><div class="fico">⭐</div><h3>솔직한 거주 리뷰</h3><p>층간소음·주차·관리비 등 이사 전 꼭 필요한 정보를 확인해요.</p></div>
+      </div>
+      <!-- 로그인 전에만 노출되는 인증 유도 -->
+
+      <div class="auth-cta" id="authCta" style="display:none">
+        <span class="ico">🛡</span>
+        <div><b>입주민 인증하고 우리 단지의 진짜 이야기를 확인하세요</b>
+        <div class="desc">인증하면 비공개 담벼락과 단지 리뷰를 모두 볼 수 있어요.</div></div>
+        <a href="#" class="btn">거주지 인증하기</a>
+      </div>
+    </div>
+  </section>
+  
+  
+  <!-- 4. 거주리뷰 인기글 + 작성 유도 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>⭐ 거주리뷰 인기글</h2><div class="sub">실거주자가 직접 작성한 솔직한 단지 리뷰</div></div>
+        <a class="btn btn-primary" href="#">✏ 내 단지 리뷰 쓰고 3,000P</a>
+      </div>
+      <div class="review-grid">
+        <article class="review-card"><div class="thumb">단지 사진</div><div class="body">
+          <div class="loc">📍 성동구 트리마제 · <span class="pill">인증거주자</span></div>
+          <h3>트리마제 자랑~~~~</h3><p>한강 뷰 최고, 관리비 적당, 주차 여유 있음. 이웃분들도 조용하고 매너 있어요.</p>
+          <div class="chips"><span class="chip">🌅 전망뷰</span><span class="chip">🚆 역 도보 1분</span><span class="chip">🔇 층간소음</span></div>
+          <div class="stars">★★★★★ 5.0</div></div></article>
+        <article class="review-card"><div class="thumb">단지 사진</div><div class="body">
+          <div class="loc">📍 강남구 래미안 신사 · <span class="pill">인증거주자</span></div>
+          <h3>더샵 완전 솔직한 장단점 후기</h3><p>층간소음 거의 없고 커뮤니티 시설 알차요. 단, 주차 공간이 좁은 편이에요.</p>
+          <div class="chips"><span class="chip">🚗 주차 불편</span><span class="chip">🏋 커뮤니티</span></div>
+          <div class="stars">★★★★☆ 4.0</div></div></article>
+        <article class="review-card"><div class="thumb">단지 사진</div><div class="body">
+          <div class="loc">📍 전세계임주택 강남 래미안 · <span class="pill">인증거주자</span></div>
+          <h3>장단점 솔직 후기</h3><p>강남 교통 최고, 관리 잘 됨. 관리비는 비싸지만 그만한 가치 있어요.</p>
+          <div class="chips"><span class="chip">🚆 교통 최고</span><span class="chip">💰 관리비</span></div>
+          <div class="stars">★★★★★ 5.0</div></div></article>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 5. 핵심 포인트 (데이터) -->
+  <section class="section points">
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>실거주자들이 가장 많이 언급한 포인트</h2><div class="sub">집을 고를 때 진짜 중요한 기준을 데이터로 확인하세요.</div></div>
+        <a class="more" href="#">거주리뷰 전체보기 ›</a>
+      </div>
+      <div class="point-grid">
+        <div class="point"><div class="pico">🔇</div><div class="pl">층간소음</div><div class="pn">4,821</div></div>
+        <div class="point"><div class="pico">🚗</div><div class="pl">주차</div><div class="pn">3,910</div></div>
+        <div class="point"><div class="pico">💰</div><div class="pl">관리비</div><div class="pn">2,654</div></div>
+        <div class="point"><div class="pico">🧼</div><div class="pl">위생</div><div class="pn">1,987</div></div>
+        <div class="point"><div class="pico">🚆</div><div class="pl">교통·입지</div><div class="pn">5,032</div></div>
+        <div class="point"><div class="pico">☀</div><div class="pl">채광</div><div class="pn">1,420</div></div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 6. 커뮤니티 허브 + 사이드 광고 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><div><h2>🔥 지금 우리 동네 이야기</h2></div><a class="more" href="#">담벼락 전체보기 ›</a></div>
+      <div class="hub">
+        <div class="panel">
+          <h3 class="ph">실시간 담벼락 인기글</h3>
+          <div class="post"><div class="meta">부동산 · 성동구 트리마제 <span class="pill">인증</span></div><div class="title">청약 당첨되면 그렇게 좋은가요?</div><div class="stat2"><span>❤ 0</span><span>💬 34</span><span>👁 59</span><span style="margin-left:auto">23분 전</span></div></div>
+          <div class="post"><div class="meta">부동산 · 강남구 래미안 신사 <span class="pill">인증</span></div><div class="title">10년 뒤 집값 어떻게 될까요?</div><div class="stat2"><span>❤ 0</span><span>💬 34</span><span>👁 59</span><span style="margin-left:auto">1시간 전</span></div></div>
+          <div class="post"><div class="meta">고민상담 · 마포구 공덕파크자이 <span class="pill">인증</span></div><div class="title">회사 일 상담 누구랑 해..?</div><div class="stat2"><span>❤ 3</span><span>💬 12</span><span>👁 88</span><span class="pill badge-new" style="margin-left:auto">NEW</span></div></div>
+          <div class="post"><div class="meta">고민상담 · 마포구 공덕파크자이 <span class="pill">인증</span></div><div class="title">회사 일 상담 누구랑 해..?</div><div class="stat2"><span>❤ 3</span><span>💬 12</span><span>👁 88</span><span class="pill badge-new" style="margin-left:auto">NEW</span></div></div>
+          <div class="post"><div class="meta">고민상담 · 마포구 공덕파크자이 <span class="pill">인증</span></div><div class="title">회사 일 상담 누구랑 해..?</div><div class="stat2"><span>❤ 3</span><span>💬 12</span><span>👁 88</span><span class="pill badge-new" style="margin-left:auto">NEW</span></div></div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-top">
+            <h3 class="ph">🔍 인기 검색어</h3><div class="upd">오후 5:02 업데이트</div>
+          </div>
+            <div class="rank-list">
+              <div class="rank"><span class="num"></span><span>반포 디에이치 클래스트</span><span class="arr up">▲</span></div>
+              <div class="rank"><span class="num"></span><span>마크로 드 서초</span><span class="pill badge-new arr">NEW</span></div>
+              <div class="rank"><span class="num"></span><span>방배 포레스트 자이</span><span class="arr down">▼</span></div>
+              <div class="rank low"><span class="num"></span><span>디에이치 센트로 나인</span><span class="pill badge-new arr">NEW</span></div>
+              <div class="rank low"><span class="num"></span><span>더샵 신풍역</span><span class="arr up">▲</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3 class="ph">🏠 우리단지 소식</h3>
+            <div class="nrow"><span class="tg">공지</span><span>엘리베이터 수리 — 내일 9~12시</span><span class="cnt">댓글 3</span></div>
+            <div class="nrow"><span class="tg new">NEW</span><span>분리수거 요일 변경됐어요</span><span class="cnt">댓글 7</span></div>
+            <div class="nrow"><span class="tg">민원</span><span>지하 주차장 주차 민원 접수</span><span class="cnt">댓글 14</span></div>
+            <div class="nrow"><span class="tg">나눔</span><span>화분 나눔합니다 — 302동 앞</span><span class="cnt">댓글 2</span></div>
+             <div class="nrow"><span class="tg">나눔</span><span>화분 나눔합니다 — 302동 앞</span><span class="cnt">댓글 2</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 8. 진행 중인 이벤트 -->
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head"><div><h2> 진행 중인 이벤트</h2></div><a class="more" href="#">이벤트 전체보기 ›</a></div>
+      <div class="events">
+        <div class="event">
+          <div class="etxt"><b>거주리뷰 작성하고 네이버 포인트 2,000P 받기</b><div class="ed">6월 30일까지 · 인증 거주자 대상 · 주 1회 작성 가능</div></div>
+          <a href="#" class="btn">이벤트 참여 →</a>
+        </div>
+      <ul class="dot">
+        <li class="active">
+          <a href="#">1</a>
+        </li>
+        <li>
+          <a href="#">2</a>
+        </li>
+      <li>
+        <a href="#">3</a>
+      </li>
+      </ul>
+     
+    </div>
+    </div>
+  </section>
+  
+  
+  <!-- 광고 슬롯 ① 인피드 배너 (Google AdSense 반응형 대비) -->
+  <section class="wrap" "="">
+    <div class="ad-slot ad-banner"><div class="label">광고 영역</div><div>Google AdSense · 반응형 배너 (예: 970×90 / 728×90 / 320×100)</div></div>
+  </section>
+  
+  
+  <!-- 7. 추천/부가 -->
+  <section class="section" style="padding-top:0">
+    <div class="wrap media-wrap">
+      <div class="item">
+        <div class="section-head"><div><h2>집담 영상</h2></div></div>
+        <div class="media-grid">
+        <div class="media"><div class="mthumb">▶</div><div class="mt">고무장갑 꺼낸 분리수거 빌런의 반전</div></div>
+        <div class="media"><div class="mthumb">▶</div><div class="mt">집값보다 중요한 진짜 정보들</div></div>
+      </div>
+      </div>
+      <div class="item">
+      <div class="section-head"><div><h2> HOT 포토리뷰</h2></div><a class="more" href="#">더보기 ›</a></div>
+      <div class="media-grid">
+        <div class="media"><div class="mthumb">📷</div><div class="mt">생활 꿀템 한강뷰</div></div>
+        <div class="media"><div class="mthumb">📷</div><div class="mt">경기 파주시 캠스파링</div></div>
+      </div>
+    </div>
+   
+    </div>
+  </section>
+  
+  
+  
+  
+  
+  
+  <!-- 9. FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="flogo">집담</div>
+      <div class="flinks">
+        <a href="#">서비스 이용약관</a><a href="#">개인정보처리방침</a>
+        <a href="#">커뮤니티 가이드</a><a href="#">신고센터</a>
+        <a href="#">공지사항</a><a href="#">고객센터</a><a href="#">광고문의</a>
+      </div>
+      <div class="copy">© 2024 MALSS. All rights reserved. · 서울 강남구 강남대로156길 29 지하 1층 · 평일 10:00–17:00 CS</div>
+    </div>
+  </footer>
+  
+  <!-- 거주리뷰 작성 상시 진입점 -->
+  <button class="fab">✏ 거주리뷰 작성</button>
+  
+
+
+</body>
+</html>
